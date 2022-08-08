@@ -9,7 +9,7 @@ import (
 type (
 	BlockChain struct {
 		Chain           []interface{}
-		LastTransaction transaction
+		LastTransaction []transaction
 		Nodes           []string
 		HashTarget      string
 	}
@@ -17,7 +17,7 @@ type (
 	Block struct {
 		Index       int
 		Time        time.Time
-		Transaction transaction
+		Transaction []transaction
 		Nonce       int
 		HashBlock   string
 	}
@@ -29,41 +29,59 @@ type (
 	}
 )
 
-func (b *BlockChain) New() {
+func New(chain *BlockChain) *BlockChain {
 
+	trans := transaction{
+		Sender:   "",
+		Receiver: "",
+		Amount:   0,
+	}
+	initialHash := chain.BlockHashing([]transaction{trans})
+
+	chain.BlockAppend(chain.PoW(0, initialHash, trans), initialHash)
+	return chain
 }
 
-func (b *BlockChain) BlockHashing(trans transaction) string {
+func (b *BlockChain) BlockHashing(trans []transaction) string {
 	return createHash(fmt.Sprintf("%v", trans))
 }
 
 func (b *BlockChain) BlockAppend(nonce int, hashing string) {
 	block := Block{
-		Index:       len(b.Chain) + 1,
+		Index:       len(b.Chain),
 		Time:        time.Now(),
 		Transaction: b.LastTransaction,
 		Nonce:       nonce,
 		HashBlock:   hashing,
 	}
 	b.Chain = append(b.Chain, block)
+	b.LastTransaction = []transaction{}
 }
 
-func (b *BlockChain) PoW(idx int, hashing string, tran transaction) /* Proof of work */ int {
+func (b *BlockChain) PoW(idx int, hashing string, tran interface{}) /* Proof of work */ int {
 	nonce := 0
 	for !b.ValPoW(idx, hashing, tran, nonce) {
-		nonce = nonce + 1
+		nonce++
 	}
 	return nonce
 }
 
-func (b *BlockChain) ValPoW(idx int, hashing string, trans transaction, nonce int) /* Validation Proof of work */ bool {
+func (b *BlockChain) ValPoW(idx int, hashing string, trans interface{}, nonce int) /* Validation Proof of work */ bool {
 	content := fmt.Sprintf("%v-%v-%v-%v", idx, hashing, trans, nonce)
 	strHash := createHash(content)
 	return strHash[0:4] == b.HashTarget
 }
 
-//private function
+func (b *BlockChain) AppendTransactions(sender, receiver string, amount float64) {
+	trans := transaction{
+		Sender:   sender,
+		Receiver: receiver,
+		Amount:   amount,
+	}
+	b.LastTransaction = append(b.LastTransaction, trans)
+}
 
+//private function
 func createHash(input string) string {
 	data := []byte(input)
 	hash := sha256.Sum256(data)

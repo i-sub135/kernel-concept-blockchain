@@ -8,7 +8,7 @@ import (
 func TestBlockChain_ValPoW(t *testing.T) {
 	type fields struct {
 		Chain           []interface{}
-		LastTransaction transaction
+		LastTransaction []transaction
 		Nodes           []string
 		HashTarget      string
 	}
@@ -28,7 +28,7 @@ func TestBlockChain_ValPoW(t *testing.T) {
 			name: "Test Validations POW",
 			fields: fields{
 				Chain:           nil,
-				LastTransaction: transaction{},
+				LastTransaction: []transaction{},
 				Nodes:           nil,
 				HashTarget:      "3c3a",
 			},

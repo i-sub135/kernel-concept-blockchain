@@ -11,7 +11,7 @@ import (
 func TestBlockChain_BlockAppend(t *testing.T) {
 	type fields struct {
 		Chain           []interface{}
-		LastTransaction transaction
+		LastTransaction []transaction
 		Nodes           []string
 	}
 	type args struct {
@@ -27,11 +27,11 @@ func TestBlockChain_BlockAppend(t *testing.T) {
 			name: "Test Append block",
 			fields: fields{
 				Chain: nil,
-				LastTransaction: transaction{
+				LastTransaction: []transaction{transaction{
 					Sender:   "a",
 					Receiver: "b",
 					Amount:   0.25,
-				},
+				}},
 				Nodes: nil,
 			},
 			args: []args{

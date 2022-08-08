@@ -9,11 +9,11 @@ import (
 func TestBlockChain_BlockHashing(t *testing.T) {
 	type fields struct {
 		Chain           []interface{}
-		LastTransaction transaction
+		LastTransaction []transaction
 		Nodes           []string
 	}
 	type args struct {
-		trans transaction
+		trans []transaction
 	}
 	tests := []struct {
 		name   string
@@ -24,14 +24,14 @@ func TestBlockChain_BlockHashing(t *testing.T) {
 			name: "Test Hashing",
 			fields: fields{
 				Chain:           nil,
-				LastTransaction: transaction{},
+				LastTransaction: []transaction{},
 				Nodes:           nil,
 			},
-			args: args{trans: transaction{
+			args: args{trans: []transaction{{
 				Sender:   "a1",
 				Receiver: "b2",
 				Amount:   0.1,
-			}},
+			}}},
 		},
 	}
 	for _, tt := range tests {
