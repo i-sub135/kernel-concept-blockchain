@@ -1,12 +1,11 @@
 package node
 
 import (
-	"fmt"
 	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
-func TestBlockChain_PoW(t *testing.T) {
+func TestBlockChain_AppendTransactions(t *testing.T) {
 	type fields struct {
 		Chain           []interface{}
 		LastTransaction []transaction
@@ -14,34 +13,37 @@ func TestBlockChain_PoW(t *testing.T) {
 		HashTarget      string
 	}
 	type args struct {
-		idx     int
-		hashing string
-		tran    transaction
+		sender   string
+		receiver string
+		amount   float64
 	}
 	tests := []struct {
 		name   string
 		fields fields
-		args   args
-		want   int
+		args   []args
+		expect int
 	}{
 		{
-			name: "Test Prof of Work",
+			name: "Test Append last transactions",
 			fields: fields{
 				Chain:           nil,
 				LastTransaction: []transaction{},
 				Nodes:           nil,
-				HashTarget:      "0000",
+				HashTarget:      "",
 			},
-			args: args{
-				idx:     1,
-				hashing: "abz",
-				tran: transaction{
-					Sender:   "a-1",
-					Receiver: "b-2",
-					Amount:   0.01,
+			args: []args{
+				{
+					sender:   "a-1",
+					receiver: "b-2",
+					amount:   0.01,
+				},
+				{
+					sender:   "a-3",
+					receiver: "b-4",
+					amount:   0.012,
 				},
 			},
-			want: 156674,
+			expect: 2,
 		},
 	}
 	for _, tt := range tests {
@@ -52,11 +54,12 @@ func TestBlockChain_PoW(t *testing.T) {
 				Nodes:           tt.fields.Nodes,
 				HashTarget:      tt.fields.HashTarget,
 			}
-			content := fmt.Sprintf("%v-%v-%v-%v", tt.args.idx, tt.args.hashing, tt.args.tran, tt.want)
-			strHash := createHash(content)
-			fmt.Println("string hash => ", strHash)
 
-			assert.Equalf(t, tt.want, b.PoW(tt.args.idx, tt.args.hashing, tt.args.tran), "PoW(%v, %v, %v)", tt.args.idx, tt.args.hashing, tt.args.tran)
+			for _, arg := range tt.args {
+				b.AppendTransactions(arg.sender, arg.receiver, arg.amount)
+			}
+
+			assert.Equal(t, tt.expect, len(b.LastTransaction))
 		})
 	}
 }
